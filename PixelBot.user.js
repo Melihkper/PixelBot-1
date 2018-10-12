@@ -1,15 +1,12 @@
 // ==UserScript==
 // @name          Pixel Bot
 // @namespace    http://tampermonkey.net/
-// @version      3.2
+// @version      3.1
 // @description  try to take over the world!
 // @author       Flyink13, DarkKeks, LoneSimba
 // @match        https://pixel.vkforms.ru/*
-// @downloadURL  https://github.com/fakecanon/PixelBot/raw/master/PixelBot.user.js
-// @updateURL    https://github.com/fakecanon/PixelBot/raw/master/PixelBot.user.js
 // @grant        none
 // ==/UserScript==
-
 
 function PixelBot() {
     window.PixelBot = PixelBot;
@@ -20,8 +17,8 @@ function PixelBot() {
     }
 
     PixelBot.url = {
-        script: 'https://raw.githack.com/fakecanon/PixelBot/master/PixelBot.user.js',
-        image: 'https://raw.githack.com/fakecanon/PixelBot/master/clear.png'
+        script: 'https://raw.githubusercontent.com/fakecanon/PixelBot/master/PixelBot.user.js',
+        image: 'https://raw.githubusercontent.com/fakecanon/PixelBot/master/clear.png'
     };
 
     PixelBot.urlGen = {
@@ -137,8 +134,8 @@ function PixelBot() {
     PixelBot.canvasClick = function(x, y, color) {
         PixelBot.resetZoom();
         PixelBot.canvasMoveTo(0, 0);
-        PixelBot.resetZoom(-200);
-        PixelBot.canvasMove(-5 * x + 5, -5 * y - 1);
+        PixelBot.resetZoom(-300);
+        PixelBot.canvasMove(x,y);
         var pxColor = PixelBot.getColor(PixelBot.ctx.getImageData(3, 3, 1, 1).data, 0);
         var colorEl = qe('.color[style="background-color: ' + color + ';"]');
         if (!colorEl) {
@@ -146,8 +143,8 @@ function PixelBot() {
             PixelBot.setState("Ошибка подбора цвета " + color);
             return PixelBot.draw();
         } else if (pxColor == color) {
-            //console.log("совпал цвет " + x + "x" + y + "%c " + pxColor, 'background:' + pxColor + ';');
-            //PixelBot.setState("пропускаю " + x + "x" + y + " совпал цвет");
+            console.log("совпал цвет " + x + "x" + y + "%c " + pxColor, 'background:' + pxColor + ';');
+            PixelBot.setState("пропускаю " + x + "x" + y + " совпал цвет");
             return PixelBot.draw();
         }
         colorEl.click();
@@ -180,7 +177,7 @@ function PixelBot() {
                 px = PixelBot.pixs.splice(Math.floor(Math.random() * 5), 1)[0];
             }
             PixelBot.canvasClick(px[0], px[1], px[2]);
-            //PixelBot.rlog();
+            PixelBot.rlog();
         }
     };
 
@@ -228,7 +225,7 @@ function PixelBot() {
     };
 
     PixelBot.wait = setInterval(function() {
-        if(PixelBot.debug) {
+        if(PixelBot.debug)
             debugger;
         if (window.localStorage.getItem('DROP_FIRST_TIME_VK12') != '1') {
             qe(".App__advance > .Button.primary").click();
@@ -253,7 +250,6 @@ function PixelBot() {
             PixelBot.pts--;
             PixelBot.draw();
         }
-      }
     }, 1e3 / 2);
 
     PixelBot.refresh = setTimeout(function() {
