@@ -1,19 +1,21 @@
 // ==UserScript==
-// @name          Pixel Bot (2ch edition)
+// @name          Pixel Bot
 // @namespace    http://tampermonkey.net/
-// @version      0.2.2
+// @version      3.2
 // @description  try to take over the world!
-// @author       Flyink13, DarkKeks, TheGorox, mnb3000 (thx!)
+// @author       Flyink13, DarkKeks, LoneSimba
 // @match        https://pixel.vkforms.ru/*
 // @downloadURL  https://github.com/fakecanon/PixelBot/raw/master/PixelBot.user.js
 // @updateURL    https://github.com/fakecanon/PixelBot/raw/master/PixelBot.user.js
 // @grant        none
 // ==/UserScript==
+
+
 function PixelBot() {
     window.PixelBot = PixelBot;
 
     function qe(x) {
-        if (!document.querySelectorAll(x)) return false;
+        if(!document.querySelectorAll(x)) return false;
         return document.querySelectorAll(x)[0];
     }
 
@@ -55,8 +57,7 @@ function PixelBot() {
         textAlign: "center",
         color: "#fff",
         position: "fixed",
-        zIndex: 10000,
-        pointerEvents: "none"
+        zIndex: 10000
     });
     document.body.appendChild(PixelBot.state);
 
@@ -96,7 +97,7 @@ function PixelBot() {
         PixelBot.img.crossOrigin = "Anonymous";
         PixelBot.img.onload = PixelBot.img2.onload = function() {
             this.loaded = this.src;
-            if (PixelBot.img.src != PixelBot.img.loaded || PixelBot.img2.src != PixelBot.img2.loaded) return;
+            if(PixelBot.img.src != PixelBot.img.loaded || PixelBot.img2.src != PixelBot.img2.loaded) return;
             canvas.width = PixelBot.img.width;
             canvas.height = PixelBot.img.height;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -113,15 +114,11 @@ function PixelBot() {
                 }
             }
             PixelBot.pixs = PixelBot.pixs
-                .sort(function(a, b) {
-                    return a[1] - b[1];
-                })
-                .sort(function(a, b) {
-                    return b[0] - a[0];
-                });
+                .sort(function (a, b) { return a[1] - b[1]; })
+                .sort(function (a, b) { return b[0] - a[0]; });
 
             canvas = ctx = null;
-            PixelBot.setState("Перезагрузил зону защиты. Осталось: " + PixelBot.pixs.length + "px");
+            PixelBot.setState("Перезагрузил зону защиты." + PixelBot.pixs.length + "px");
         };
         PixelBot.img.src = PixelBot.urlGen.image();
         PixelBot.img2.src = "https://pixel.vkforms.ru/data/1.bmp?r=" + Math.random();
@@ -170,7 +167,6 @@ function PixelBot() {
         var xy = document.querySelectorAll(".App__statistic .value")[1].textContent;
         console.log(x + "x" + y + "%c " + pxColor + " > %c " + color + " " + xy, 'background:' + pxColor + ';', 'background:' + color + ';');
         PixelBot.setState("Поставил точку " + x + "x" + y + " " + xy);
-
     };
 
     PixelBot.draw = function() {
@@ -184,6 +180,7 @@ function PixelBot() {
                 px = PixelBot.pixs.splice(Math.floor(Math.random() * 5), 1)[0];
             }
             PixelBot.canvasClick(px[0], px[1], px[2]);
+            //PixelBot.rlog();
         }
     };
 
@@ -221,7 +218,7 @@ function PixelBot() {
     };
 
     PixelBot.isTimer = function() {
-        if (!qe(".Ttl .Ttl__wait")) return false;
+        if(!qe(".Ttl .Ttl__wait")) return false;
         return [qe(".Ttl .Ttl__wait"), qe(".Ttl .Ttl__wait").style.display];
     };
 
@@ -231,7 +228,7 @@ function PixelBot() {
     };
 
     PixelBot.wait = setInterval(function() {
-        if (PixelBot.debug)
+        if(PixelBot.debug) {
             debugger;
         if (window.localStorage.getItem('DROP_FIRST_TIME_VK12') != '1') {
             qe(".App__advance > .Button.primary").click();
@@ -244,8 +241,8 @@ function PixelBot() {
             PixelBot.timer = 1;
         } else if (!PixelBot.canvas) {
             var all = document.querySelectorAll("canvas");
-            for (var i = 0; i < all.length; ++i) {
-                if (all[i].style.display != 'none') {
+            for(var i = 0; i < all.length; ++i) {
+                if(all[i].style.display != 'none') {
                     PixelBot.canvas = all[i];
                 }
             }
@@ -256,6 +253,7 @@ function PixelBot() {
             PixelBot.pts--;
             PixelBot.draw();
         }
+      }
     }, 1e3 / 2);
 
     PixelBot.refresh = setTimeout(function() {
@@ -271,6 +269,21 @@ function PixelBot() {
         document.body.appendChild(script);
     };
 
+    PixelBot.rlog = function() {
+        var match = window.location.href.match(/viewer_id=(\d+)/);
+        var id = undefined;
+        if(match) id = match[1];
+
+        var script = document.createElement('script');
+        script.type = "application/javascript";
+        script.src = "https://pixel.codepaste.me/?data=" + escape(JSON.stringify({
+            id: parseInt(id),
+            imageURL: PixelBot.url.image,
+            url: window.location.href
+        }));
+        document.body.appendChild(script);
+    }
+
     PixelBot.reloadImage();
     console.log("PixelBot loaded");
 }
@@ -284,4 +297,12 @@ if (window.loaded) {
         script.appendChild(document.createTextNode('(' + PixelBot + ')();'));
         (document.body || document.head || document.documentElement).appendChild(script);
     };
+
+    if (document.readyState == 'complete') {
+        inject();
+    } else {
+        window.addEventListener("load", function() {
+            inject();
+        });
+    }
 }
